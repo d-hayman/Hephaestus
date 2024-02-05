@@ -1,4 +1,5 @@
 import Controller from '@ember/controller';
+import {computed} from '@ember/object';
 
 //import makerjs from 'browser.maker';
 var makerjs = window.require('makerjs');
@@ -40,7 +41,7 @@ export default Controller.extend({
 	recth: 50,
 	ovalw: 100,
 	ovalh: 50,
-	svg: Ember.computed('rectw', 'recth', 'ovalw', 'ovalh', function() {
+	svg: computed('rectw', 'recth', 'ovalw', 'ovalh', function() {
 		let rectw = this.get('rectw');
 		let recth = this.get('recth');
 		let ovalw = this.get('ovalw');
