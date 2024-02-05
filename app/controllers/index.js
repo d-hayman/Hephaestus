@@ -15,29 +15,6 @@ function generatesvg(height, width, depth, rows, columns, recess, bottom){
   var h = height*scaleFactor;
   var w = width*scaleFactor;
   var t = woodThickness * scaleFactor;
-  
-  /*
-   * Generates a "shelf" for the display model, which is at least a top and a right side
-   * The leftmost column in a stack should have left set to true so that the leftmost wall generates
-   * All shelves with a bottom should have bottom set to true and be positioned to overlap said bottom by thickness
-   * The only shelves that don't have a bottom are bottom row shelves when bottom is unchecked for the whole unit
-   */
-  function generateshelf(origin, height, width, thickness, left, bottom) {
-    this.models = {
-      recttop: makerjs.$(new makerjs.models.Rectangle(width+(2*thickness), thickness))
-               .move([0, height+(bottom?thickness:0) ])
-               .$result,
-      rectright: makerjs.$(new makerjs.models.Rectangle( thickness, height+(bottom?2*thickness:thickness) ))
-               .move([width+thickness,0])
-               .$result
-    };
-    if(left){
-      this.models.rectleft = makerjs.$(new makerjs.models.Rectangle(thickness, height+(bottom?2*thickness:thickness) ))
-               .move([0,0])
-               .$result
-    }
-    this.origin = origin;
-  }
 
   //set up shelves object
   var shelves = {
@@ -48,14 +25,15 @@ function generatesvg(height, width, depth, rows, columns, recess, bottom){
   };
   
   //generate shelves
-  if(bottom){
-    var bshelf = makerjs.$(new makerjs.models.Rectangle(columns*(w+t)+t,t)).move([0,0]).$result;
-    shelves.models.bottomshelf = bshelf;
+  for(var c = 0; c <= columns; c++){
+    shelves.models["wall"+c] =  makerjs.$(new makerjs.models.Rectangle( t, (t+h)*rows+(bottom?t:0) ))
+               .move([(w+t)*c, 0])
+               .$result;
   }
-  for(var c = 0; c < columns; c++){
-    for(var r = 0; r < rows; r++){
-      shelves.models["c"+c+"r"+r] = new generateshelf([(w+t)*c, r>0?((h+t)*r):bottom?0:t], h, w, t, c==0, r>0 || bottom)
-	}
+  for(var r = (bottom?0:1); r <= rows; r++){
+    shelves.models["shelf"+r] = makerjs.$(new makerjs.models.Rectangle((t+w)*columns+t, t))
+               .move([0, (h+t)*r - (bottom?0:t) ])
+               .$result;
   }
 
   //generate bounding box
