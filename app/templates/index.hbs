@@ -5,17 +5,16 @@
 		  {{input type="checkbox" checked=showsvgout}}Show Debug output
 		</div>
 		
-		<div class="col-md-8 col-sm-12 bg-info" style="overflow: hidden; height:600px;">
+		<div class="col-md-8 col-sm-12 bg-pale" style="overflow: hidden; height:600px;">
 		  <div class="container-fluid" id = "svgView">
 			  <div class="aligned-row">
-			    <div class="col-xs-1 svglabel-holder">
+			    <div class="col-2 svglabel-holder">
 			      <p class="svglabel-left">{{heightRange}}</p>
 			    </div>
-				<div class="col-xs-11">
+				<div class="col-10">
 			      {{{svg}}}
 			    </div>
-			    <div class="col-xs-1"/>
-				<div class="col-xs-11">
+				<div class="col-9 offset-md-2_5">
 			      <p class="svglabel-bottom">{{widthRange}}</p>
 				</div>
 			  </div>
@@ -26,45 +25,60 @@
 		</div>
 		
 		<div class="col-md-2 col-sm-12 bg-light">
-	    	Rows:{{rows}}
-			<input type="range" 
-			oninput={{action (mut rows) value="target.value"}} 
-			min=1 
-			max=6
-			value={{rows}} 
-			step="1">
-	    	Columns:{{columns}}
-			<input type="range" 
-			oninput={{action (mut columns) value="target.value"}} 
-			min=1 
-			max=4
-			value={{columns}} 
-			step="1">
-	    	Shelf Inner Height:{{height}}"
-			<input type="range" 
-			oninput={{action (mut height) value="target.value"}} 
-			min=2 
-			max=10
-			value={{height}} 
-			step=".25">
-	    	Shelf Inner Width:{{width}}"
-			<input type="range" 
-			oninput={{action (mut width) value="target.value"}} 
-			min=2 
-			max=10
-			value={{width}} 
-			step=".25">
-	    	Shelf Inner Depth:{{depth}}"
-			<input type="range" 
-			oninput={{action (mut depth) value="target.value"}} 
-			min=2 
-			max=10
-			value={{depth}} 
-			step=".25">
-			{{input type="checkbox" checked=bottom}}Bottom Shelf
+		  <form>
+		    <div class="form-group">
+	    	  <label for="rowslider">Rows:{{rows}}</label>
+			  <input type="range" class="form-control"
+			    id="rowslider"
+			    oninput={{action (mut rows) value="target.value"}} 
+			    min=1 
+			    max=6
+			    value={{rows}} 
+			    step="1">
+	    	  <label for="columnslider">Columns:{{columns}}</label>
+			  <input type="range" class="form-control"
+			    id="columnslider"
+			    oninput={{action (mut columns) value="target.value"}} 
+			    min=1 
+			    max=4
+			    value={{columns}} 
+			    step="1">
+			</div>
+			<div class="form-group">
+	    	  <label for="heightslider">Shelf Inner Height:{{height}}"</label>
+			  <input type="range"  class="form-control"
+			    id="heightslider"
+			    oninput={{action (mut height) value="target.value"}} 
+			    min=2 
+			    max=10
+			    value={{height}} 
+			    step=".25">
+	    	  <label for="widthslider">Shelf Inner Width:{{width}}"</label>
+			  <input type="range" class="form-control"
+			    id="widthslider"
+			    oninput={{action (mut width) value="target.value"}} 
+			    min=2 
+			    max=10
+			    value={{width}} 
+			    step=".25">
+	    	  <label for="depthslider">Shelf Inner Depth:{{depth}}"</label>
+			  <input type="range"  class="form-control"
+			    id="depthslider"
+			    oninput={{action (mut depth) value="target.value"}} 
+			    min=2 
+			    max=10
+			    value={{depth}} 
+			    step=".25">
+			</div>
+			<div class="form-group">
+			  <div class="form-control">
+			    {{input type="checkbox" checked=bottom}}<span> Bottom Shelf</span>
+			  </div>
+			</div>
+		  </form>
 		</div>
 		
-		<div class="col-md-12 bg-primary {{hidesvgout}}">
+		<div class="col-md-12 bg-debug {{hidesvgout}}">
 		    {{svg}}
 		</div>
 		
