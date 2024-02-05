@@ -109,6 +109,7 @@ function generatesvg(model, selected){
   shelves.paths["widthguide"] = new makerjs.paths.Line([0, -1], [totalWidth, -1]);
   if(unitCenter != null){
     shelves.models['arrow'] = new makeArrow(unitCenter, totalHeight);
+	shelves.models.arrow.layer = "red";
   }
 
   //generate bounding box
