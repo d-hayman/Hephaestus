@@ -52,6 +52,6 @@
   },
   "dependencies": {
     "makerjs": "^0.9.93",
-    "svg-pan-zoom": "github:ariutta/svg-pan-zoom"
+    "panzoom": "^4.5.0"
   }
 }

@@ -1,40 +1,56 @@
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-md-2 col-sm-12 bg-light">
-		foo
+		{{input type="checkbox" checked=showsvgout}}Show Debug output
 		</div>
-		<div class="col-md-8 col-sm-12 bg-info" id="svgView" style="overflow: hidden; height:300px;">
-		{{{svg}}}
+		<div class="col-md-8 col-sm-12 bg-info" id="svgView" style="overflow: hidden; height:600px;">
+		  <div>
+		    {{{svg}}}
+		  </div>
+		  <div class="utilbar">
+			{{#bs-button type="warning" onClick=(action "resetViewer")}}Reset{{/bs-button}}
+		  </div>
 		</div>
 		<div class="col-md-2 col-sm-12 bg-light">
+	    	Rows:{{rows}}
 			<input type="range" 
-			oninput={{action (mut rectw) value="target.value"}} 
-			min=0 
-			max=100
-			value={{rectw}} 
-			step=".5">
-			rect width:{{rectw}}
+			oninput={{action (mut rows) value="target.value"}} 
+			min=1 
+			max=6
+			value={{rows}} 
+			step="1">
+	    	Columns:{{columns}}
 			<input type="range" 
-			oninput={{action (mut recth) value="target.value"}} 
-			min=0 
-			max=100
-			value={{recth}} 
-			steps="1">
-			rect height:{{recth}}
+			oninput={{action (mut columns) value="target.value"}} 
+			min=1 
+			max=4
+			value={{columns}} 
+			step="1">
+	    	Shelf Inner Height:{{height}}
 			<input type="range" 
-			oninput={{action (mut ovalw) value="target.value"}} 
-			min=0 
-			max=100
-			value={{ovalw}} 
-			steps="1">
-			oval width:{{ovalw}}
+			oninput={{action (mut height) value="target.value"}} 
+			min=2 
+			max=10
+			value={{height}} 
+			step=".25">
+	    	Shelf Inner Width:{{width}}
 			<input type="range" 
-			oninput={{action (mut ovalh) value="target.value"}} 
-			min=0 
-			max=100
-			value={{ovalh}} 
-			steps="1">
-			oval height:{{ovalh}}
+			oninput={{action (mut width) value="target.value"}} 
+			min=2 
+			max=10
+			value={{width}} 
+			step=".25">
+	    	Shelf Inner Depth:{{depth}}
+			<input type="range" 
+			oninput={{action (mut depth) value="target.value"}} 
+			min=2 
+			max=10
+			value={{depth}} 
+			step=".25">
+			{{input type="checkbox" checked=bottom}}Bottom Shelf
+		</div>
+		<div class="col-md-12 bg-primary {{hidesvgout}}">
+		    {{svg}}
 		</div>
 	</div>
 </div>

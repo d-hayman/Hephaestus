@@ -24,7 +24,7 @@ module.exports = function(defaults) {
   // please specify an object with the list of modules as keys
   // along with the exports of each module as its value.
   
-  app.import('node_modules/svg-pan-zoom/dist/svg-pan-zoom.js');
+  app.import('node_modules/panzoom/dist/panzoom.js');
   app.import('node_modules/makerjs/target/js/browser.maker.js');
 
   return app.toTree();
