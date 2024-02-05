@@ -1,18 +1,18 @@
 <div class="container-fluid">
 	<div class="row">
-		<div class="col-md-4 col-sm-12 bg-light">
+		<div class="col-md-2 col-sm-12 bg-light">
 		foo
 		</div>
-		<div class="col-md-4 col-sm-12 bg-info">
+		<div class="col-md-8 col-sm-12 bg-info" id="svgView" style="overflow: hidden; height:300px;">
 		{{{svg}}}
 		</div>
-		<div class="col-md-4 col-sm-12 bg-light">
+		<div class="col-md-2 col-sm-12 bg-light">
 			<input type="range" 
 			oninput={{action (mut rectw) value="target.value"}} 
 			min=0 
 			max=100
 			value={{rectw}} 
-			steps="1">
+			step=".5">
 			rect width:{{rectw}}
 			<input type="range" 
 			oninput={{action (mut recth) value="target.value"}} 
@@ -37,7 +37,7 @@
 			oval height:{{ovalh}}
 		</div>
 	</div>
-	</div>
+</div>
 <!--	{{#bs-tab as |tab|}}
   {{#tab.pane title="Tab 1"}}
     <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</p>
