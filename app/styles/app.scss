@@ -1,9 +1,15 @@
+$editor: rgba(217, 237, 247, 1);
+$form: rgba(248, 249, 250, 1);
+$header: rgba(107, 125, 125, 1);
+$color4: rgba(18, 69, 89, 1);
+$color5: rgba(89, 95, 114, 1);
+
 .bg-pale {
-  background-color: #d9edf7;
+  background-color: $editor;
 }
 .bg-debug {
   color: #fff;
-  background-color: #337ab7;
+  background-color: $color4;
 }
 .hideme {
   display: none;
@@ -40,5 +46,8 @@ form {
 .form-title {
   padding-top: 15px;
   text-align: center;
+  background-color: $header;
+  color: #fff;
 }
+
 @import "ember-bootstrap/bootstrap";
