@@ -23,6 +23,11 @@
                 {{/each}} 
               </select>
 		    </div>
+			<div class="row">
+			  <button class="col-4" type="button" {{action "generateFile"}} data-toggle="tooltip" title="Save to file">Save</button>
+			  <output>
+			  </output>
+			</div>
 		  </div>
 		  {{input type="checkbox" checked=showsvgout}}Show Debug output
 		</div>

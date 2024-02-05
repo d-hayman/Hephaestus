@@ -8,6 +8,8 @@ import {instrument} from '@ember/instrumentation';
 var makerjs = window.require('makerjs');
 var spz = window.panzoom;
 
+var output;
+
 //defaults
 var dfScale = 0.5;
 var dfPanX = 50;
@@ -165,6 +167,7 @@ export default Controller.extend(Ember.TargetActionSupport, {
       document.body.addEventListener('zoom', function(e) {
         instrument('zoom', e);// We can't just access controller data here so tell route to tell controller to change the text size
       }, true);
+	  output = document.querySelector('output');
       this.triggerAction({
         action:'addUnit',
         target: this
@@ -238,6 +241,24 @@ export default Controller.extend(Ember.TargetActionSupport, {
         else
           shelfUnit.set('hideUnselected', "");
       });
+	},
+	generateFile(){
+      var prevLink = output.querySelector('a');
+      if (prevLink) {
+        window.URL.revokeObjectURL(prevLink.href);
+        output.innerHTML = '';
+      }
+	  
+	  var blob = new Blob([this.get('svg')], {type: 'text/plain'});
+      var a = document.createElement('a');
+      a.download = "svg.svg";
+	  a.href = window.URL.createObjectURL(blob);
+	  a.textContent = 'Download ready';
+	  output.appendChild(a);
+	  
+	  a.onclick = function(e) {
+        output.querySelector('a').textContent = 'Download again';
+      };
 	}
   }
 });
