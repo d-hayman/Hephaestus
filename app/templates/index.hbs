@@ -1,7 +1,7 @@
 <div class="container-fluid">
 	<div class="row">
 	
-		<div class="col-md-2 col-sm-12 bg-light">
+		<div class="col-md-2 col-12 bg-light">
 		  <div class="container-fluid bg-info form-title">
             <div class="row">
 	          <div class="col-12">
@@ -11,11 +11,15 @@
           </div>
 		  <div class="container-fluid" style="margin-top: 15px;">
 		    <div class="row">
-		      <button class="col-6" type="button" {{action "addUnit" song}}>Add</button>
-		      <button class="col-6" type="button" {{action "removeUnit" song}}>Remove</button>
+		      <button class="d-none d-md-block" type="button" {{action "addUnit"}} data-toggle="tooltip" title="Add New Shelf Unit"><span class="fa fa-plus-circle"></span></button>
+			  <button class="d-none d-md-block" type="button" {{action "insertUnit"}} data-toggle="tooltip" title="Insert New Shelf Unit After The Selected Unit"><span class="fa fa-arrow-circle-down"></span></button>
+		      <button class="d-none d-md-block" type="button" {{action "removeUnit"}} data-toggle="tooltip" title="Remove Selected Shelf Unit"><span class="fa fa-minus-circle"></span></button>
+		      <button class="d-block d-md-none col-4" type="button" {{action "addUnit"}} data-toggle="tooltip" title="Add New Shelf Unit">Add</button>
+			  <button class="d-block d-md-none col-4" type="button" {{action "insertUnit"}} data-toggle="tooltip" title="Insert New Shelf Unit After The Selected Unit">Insert</button>
+		      <button class="d-block d-md-none col-4" type="button" {{action "removeUnit"}} data-toggle="tooltip" title="Remove Selected Shelf Unit">Remove</button>
               <select class="col-12" size=5 required name="shelfUnits" onchange={{action "setSelection" value="target.value"}} value={{currentUnit}}>
                 {{#each model.shelfUnits as |shelfUnit|}}     
-                  <option value={{shelfUnit.tempid}}>Unit {{shelfUnit.tempid}}</option>      
+                  <option value={{shelfUnit.position}}>Unit {{shelfUnit.position}}</option>      
                 {{/each}} 
               </select>
 		    </div>
@@ -23,7 +27,7 @@
 		  {{input type="checkbox" checked=showsvgout}}Show Debug output
 		</div>
 		
-		<div class="col-md-8 col-sm-12 bg-pale" style="overflow: hidden; height:600px;">
+		<div class="col-md-8 col-12 bg-pale" style="overflow: hidden; height:600px;">
 		  <div class="container-fluid" id = "svgView">
 			  <div class="aligned-row">
 			    <div class="col-2 svglabel-holder">
@@ -42,7 +46,7 @@
 		  </div>
 		</div>
 		
-		<div class="col-md-2 col-sm-12 bg-light">
+		<div class="col-md-2 col-12 bg-light">
 		  {{#each model.shelfUnits as |shelfUnit|}}
 		    {{unit-fields model=shelfUnit}}
 		  {{/each}}

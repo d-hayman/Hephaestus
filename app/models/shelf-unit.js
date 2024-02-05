@@ -8,6 +8,7 @@ export default DS.Model.extend({
   columns: DS.attr('number'),
   recess: DS.attr('number'),
   bottom: DS.attr('boolean'),
+  position: DS.attr('number'),
   
   shelfSeries: DS.belongsTo('shelf-series')
 });

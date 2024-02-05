@@ -19,12 +19,24 @@ var diRows = 1;
 var diColumns = 1;
 var dfRecess = 0.0;
 var dbBottom = false;
+var tempidC = 1;
+
+//configure new shelf unit
+function configureUnit(sUnit){
+  sUnit.set('height', dfHeight);
+  sUnit.set('width', dfWidth);
+  sUnit.set('depth', dfDepth);
+  sUnit.set('rows', diRows);
+  sUnit.set('columns', diColumns);
+  sUnit.set('recess', dfRecess);
+  sUnit.set('bottom', dbBottom);
+  sUnit.set('position', tempidC++);
+}
 
 //behind the scenes rendering vars
 var woodThickness = .67;
 var minThickness = .5;
 var maxThickness = 1;
-var tempidC = 1;
     
 function generatesvg(model){
   var t = woodThickness;
@@ -153,31 +165,50 @@ export default Controller.extend(Ember.TargetActionSupport, {
 	addUnit(){//creates a new shelf unit with default values
       let sSeries = this.get('model');
       let sUnit = this.store.createRecord('shelf-unit');
-      sUnit.set('height', dfHeight);
-      sUnit.set('width', dfWidth);
-      sUnit.set('depth', dfDepth);
-      sUnit.set('rows', diRows);
-      sUnit.set('columns', diColumns);
-      sUnit.set('recess', dfRecess);
-      sUnit.set('bottom', dbBottom);
-      sUnit.set('tempid', tempidC++);
+      configureUnit(sUnit);
       sSeries.get('shelfUnits').addObject(sUnit);
-      this.send('setSelection', sUnit.tempid);
-	},
-	removeUnit(){
-      let tid = this.get('currentUnit');
-      let shelfUnits = this.get('model').get('shelfUnits');
-      shelfUnits.forEach((shelfUnit) => {
-        if(shelfUnit.tempid == tid)
-          shelfUnits.removeObject(shelfUnit);
+      scheduleOnce("afterRender",this,function() {
+        this.send('setSelection', sUnit.position);
       });
-      this.send('setSelection', -1);
+	},
+	removeUnit(){//removes selected units, rolls back the counter, and updates positions of subsequent units
+      let pos = this.get('currentUnit');
+      let shelfUnits = this.get('model').get('shelfUnits');
+      let found = null;
+      shelfUnits.forEach((shelfUnit) => {
+        if(shelfUnit.position == pos){
+          found = shelfUnit;
+          tempidC--;
+		}
+		else if (found != null){
+			shelfUnit.set('position', shelfUnit.position-1);
+		}
+      });
+      shelfUnits.removeObject(found);
+      scheduleOnce("afterRender",this,function() {
+        this.send('setSelection', pos-1);
+      });
+	},
+	insertUnit(){//inserts a unit after the selected unit, cleans all positions
+      let pos = this.get('currentUnit');
+      if(pos < 1)
+        return;
+      let sUnit = this.store.createRecord('shelf-unit');
+      configureUnit(sUnit);
+      let shelfUnits = this.get('model').get('shelfUnits');
+      shelfUnits.insertAt(pos,sUnit);
+      shelfUnits.forEach((shelfUnit, index) => {
+        shelfUnit.set('position',index+1);
+      });
+      scheduleOnce("afterRender",this,function() {
+        this.send('setSelection', parseInt(pos)+1 );
+      });
 	},
 	setSelection(selected){
       this.set('currentUnit', selected);
       let shelfUnits = this.get('model').get('shelfUnits');
       shelfUnits.forEach((shelfUnit) => {
-        if(shelfUnit.tempid != selected)
+        if(shelfUnit.position != selected)
           shelfUnit.set('hideUnselected', "hideme");
         else
           shelfUnit.set('hideUnselected', "");
