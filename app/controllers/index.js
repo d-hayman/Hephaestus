@@ -38,7 +38,7 @@ var woodThickness = .67;
 var minThickness = .5;
 var maxThickness = 1;
     
-function generatesvg(model){
+function generatesvg(model, selected){
   var t = woodThickness;
   
   function generateshelfUnit(height, width, rows, columns, bottom){
@@ -55,12 +55,23 @@ function generatesvg(model){
                .$result;
     }
   }
+  
+  function makeArrow(x, y){
+    var temp = {
+      paths: {
+        left: new makerjs.paths.Line([x - 1, y+2], [x, y+1]),
+        right: new makerjs.paths.Line([x, y+1], [x+1, y+2])
+      }
+    };
+	this.models = {
+      arrow: makerjs.model.expandPaths(temp, 0.25)
+	}
+  }
 
   //set up shelves object
   var shelves = {
-    models: {
-      //debug: new generateshelf([0, 0], h, w, t, true, false)
-    },
+    models: {},
+	paths:{},
     units: makerjs.unitType.Inch
   };
   
@@ -72,6 +83,7 @@ function generatesvg(model){
   var minWidth = 0;
   var maxWidth = 0;
   var shelfUnits = model.get('shelfUnits');
+  var unitCenter = null;
   shelfUnits.forEach((shelfUnit, index) => {
 	let height = parseFloat(shelfUnit.get('height'));
 	let width = parseFloat(shelfUnit.get('width'));
@@ -79,6 +91,9 @@ function generatesvg(model){
 	let columns = parseInt(shelfUnit.get('columns'));
 	let bottom = shelfUnit.get('bottom');
     shelves.models["unit"+index] = makerjs.model.move(new generateshelfUnit(height, width, rows, columns, bottom), [totalWidth, 0]);
+	if(index == selected-1)
+      unitCenter = totalWidth+((t+width)*columns+t)/2;
+	//collect measurements
 	totalWidth += (width+t) * columns;
 	totalHeight = Math.max(totalHeight, (height+t) * rows + (bottom?t:0));
 	minHeight = Math.max(minHeight, (height+minThickness) * rows + (bottom?minThickness:0));
@@ -89,11 +104,12 @@ function generatesvg(model){
   //add last wall to measurements
   totalWidth+=t; minWidth+=minThickness; maxWidth+=maxThickness;
   
-  //generate measurements
-  shelves.paths = {
-    "heightguide": new makerjs.paths.Line([-1, 0], [-1, totalHeight]),
-    "widthguide": new makerjs.paths.Line([0, -1], [totalWidth, -1])
-  };
+  //generate visual guides
+  shelves.paths["heightguide"] = new makerjs.paths.Line([-1, 0], [-1, totalHeight]);
+  shelves.paths["widthguide"] = new makerjs.paths.Line([0, -1], [totalWidth, -1]);
+  if(unitCenter != null){
+    shelves.models['arrow'] = new makeArrow(unitCenter, totalHeight);
+  }
 
   //generate bounding box
   //var bbox = makerjs.$(new makerjs.models.Rectangle(shelves, 5)).moveRelative([4,-4]).$result;
@@ -128,9 +144,10 @@ export default Controller.extend(Ember.TargetActionSupport, {
     return ''+this.get('renderData').minWidth+' - '+this.get('renderData').maxWidth+' Inches'; 
   }),
   svg: computed('renderData.svg', function() { return this.get('renderData').svg; }),
-  renderData: computed('model.shelfUnits.@each.{height,width,depth,rows,columns,recess,bottom}', function() {
+  renderData: computed('model.shelfUnits.@each.{height,width,depth,rows,columns,recess,bottom}', 'currentUnit', function() {
     let model = this.get('model');
-    return generatesvg(model);
+	let currentUnit = this.get('currentUnit');
+    return generatesvg(model, currentUnit);
   }),
 
   init: function () {//set SVGPanZoom after svg has finished rendering
