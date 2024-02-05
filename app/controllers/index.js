@@ -94,7 +94,7 @@ function generatesvg(model, selected){
     shelves.models["unit"+index] = makerjs.model.move(new generateshelfUnit(height, width, rows, columns, bottom), [totalWidth, 0]);
 	if(index == selected-1){
       unitCenter = totalWidth+((t+width)*columns+t)/2;
-	  highlightedSection = makerjs.cloneObject(shelves.models["unit"+index]);
+      highlightedSection = makerjs.cloneObject(shelves.models["unit"+index]);
       highlightedSection.layer = "blue";
 	}
 	//collect measurements
@@ -214,19 +214,19 @@ export default Controller.extend(Ember.TargetActionSupport, {
         this.send('setSelection', pos-1);
       });
 	},
-	insertUnit(){//inserts a unit after the selected unit, cleans all positions
+	insertUnit(){//inserts a unit before the selected unit, cleans all positions
       let pos = this.get('currentUnit');
       if(pos < 1)
         return;
       let sUnit = this.store.createRecord('shelf-unit');
       configureUnit(sUnit);
       let shelfUnits = this.get('model').get('shelfUnits');
-      shelfUnits.insertAt(pos,sUnit);
+      shelfUnits.insertAt(pos-1,sUnit);
       shelfUnits.forEach((shelfUnit, index) => {
         shelfUnit.set('position',index+1);
       });
       scheduleOnce("afterRender",this,function() {
-        this.send('setSelection', parseInt(pos)+1 );
+        this.send('setSelection', parseInt(pos) );
       });
 	},
 	setSelection(selected){
