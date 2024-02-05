@@ -2,25 +2,25 @@ import Controller from '@ember/controller';
 import {computed} from '@ember/object';
 //import {observer} from '@ember/object';
 import {scheduleOnce} from '@ember/runloop';
+import {instrument} from '@ember/instrumentation';
 
-//import makerjs from 'browser.maker';
+//handles to 3rd party libs
 var makerjs = window.require('makerjs');
 var spz = window.panzoom;
-var oType = window.opentype;
 
-//get the font object for total measurements and then alert the controller to update the render
-var measureFont = null;
-function initFont(controller){
-  oType.load('./assets/fonts/Roboto-Black.ttf', function (err, font) {
-    if (err) {
-      //alert("failed to load measureFont");
-    } else {
-      measureFont = font;
-      controller.set('mfFlag', true);
-    }
-  });
-}
+//defaults
+var dfScale = 0.5;
+var dfPanX = 50;
+var dfPanY = 50;
+var dfHeight = 5.0;
+var dfWidth = 5.0;
+var dfDepth = 5.0;
+var diRows = 1;
+var diColumns = 1;
+var dfRecess = 0.0;
+var dbBottom = false;
 
+//behind the scenes rendering vars
 var woodThickness = .67;
 var minThickness = .5;
 var maxThickness = 1;
@@ -57,19 +57,6 @@ function generatesvg(height, width, depth, rows, columns, recess, bottom){
     "heightguide": new makerjs.paths.Line([-1, 0], [-1, (t+h)*rows+(bottom?t:0)]),
     "widthguide": new makerjs.paths.Line([0, -1], [(t+w)*columns+t, -1])
   };
-  
-  if(measureFont){//friendly reminder to use scaled values (just in case) for actual coords but unscaled in text strings
-    var minHeight = (minThickness+height)*rows+(bottom?minThickness:0);
-	var maxHeight = (maxThickness+height)*rows+(bottom?maxThickness:0);
-	var minWidth = (minThickness+width)*columns+minThickness;
-	var maxWidth = (maxThickness+width)*columns+maxThickness;
-    shelves.models.vertical = makerjs.$(new makerjs.models.Text(measureFont, ''+minHeight+' - '+maxHeight+' Inches', .3))
-               .move([-4, ((t+h)*rows+(bottom?t:0))/2 ])
-               .$result;
-    shelves.models.horizontal = makerjs.$(new makerjs.models.Text(measureFont, ''+minWidth+' - '+maxWidth+'Inches', .3))
-               .move([((t+w)*columns+t)/2, -1.5 ])
-               .$result;
-  }
 
   //generate bounding box
   //var bbox = makerjs.$(new makerjs.models.Rectangle(shelves, 5)).moveRelative([4,-4]).$result;
@@ -85,10 +72,8 @@ function generatesvg(height, width, depth, rows, columns, recess, bottom){
   return  makerjs.exporter.toSVG(shelves);
 }
 
-
-//document.write(svg);
-
-export default Controller.extend({
+//begin core controller logic
+export default Controller.extend(Ember.TargetActionSupport, {
   showsvgout: false,
   hidesvgout: computed('showsvgout', function() {
     let showsvgout = this.get('showsvgout');
@@ -96,17 +81,32 @@ export default Controller.extend({
   }),
   
   spzInstance: 'w',
-  mfFlag:false,
 
-  height: 5,
-  width: 5,
-  depth: 5,
-  rows: 1,
-  columns: 1,
-  recess: 0,
-  bottom: false,
+  height: dfHeight,
+  width: dfWidth,
+  depth: dfDepth,
+  rows: diRows,
+  columns: diColumns,
+  recess: dfRecess,
+  bottom: dbBottom,
+  
+  heightRange: computed('height', 'rows', 'bottom', function() {
+    let height = parseFloat(this.get('height'));
+    let rows = parseInt(this.get('rows'));
+    let bottom = this.get('bottom');
+	var minHeight = (minThickness+height)*rows+(bottom?minThickness:0);
+	var maxHeight = (maxThickness+height)*rows+(bottom?maxThickness:0);
+	return ''+minHeight+' - '+maxHeight+' Inches';
+  }),
+  widthRange: computed('width', 'columns', function() {
+    let width = parseFloat(this.get('width'));
+    let columns = parseInt(this.get('columns'));
+	var minWidth = (minThickness+width)*columns+minThickness;
+	var maxWidth = (maxThickness+width)*columns+maxThickness;
+    return ''+minWidth+' - '+maxWidth+' Inches';
+  }),
 
-  svg: computed('mfFlag','height', 'width', 'depth', 'rows', 'columns', 'recess', 'bottom', function() {
+  svg: computed('height', 'width', 'depth', 'rows', 'columns', 'recess', 'bottom', function() {
     let height = this.get('height');
     let width = this.get('width');
     let depth = this.get('depth');
@@ -126,17 +126,27 @@ export default Controller.extend({
   init: function () {//set SVGPanZoom after svg has finished rendering
     this._super();
     scheduleOnce("afterRender",this,function() {
-      this.set('spzInstance',spz(document.querySelector('#svgView div')));
-      this.get('spzInstance').zoomAbs(30, 50, 0.5);
-      initFont(this);
+      this.set('spzInstance',spz(document.querySelector('#svgView')));
+      document.body.addEventListener('zoom', function(e) {
+        instrument('zoom', e);// We can't just access controller data here so tell route to tell controller to change the text size
+      }, true);
+      this.triggerAction({
+        action:'resetViewer',
+        target: this
+      });
     });
   },
 
   actions: {
     resetViewer() {//reset button action
       var tmp = this.get('spzInstance');
-      tmp.zoomAbs(30, 50, 0.5);
-      tmp.moveTo(30,50);
-    }
+      tmp.zoomAbs(dfPanX, dfPanY, dfScale);
+      tmp.moveTo(dfPanX, dfPanY);
+    },
+	zoom(/*context*/){
+		var tmp = this.get('spzInstance');
+		document.querySelector('.svglabel-left').style.fontSize = ''+(14/tmp.getTransform().scale)+'pt';
+		document.querySelector('.svglabel-bottom').style.fontSize = ''+(14/tmp.getTransform().scale)+'pt';
+	}
   }
 });

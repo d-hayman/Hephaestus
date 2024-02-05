@@ -1,16 +1,30 @@
 <div class="container-fluid">
 	<div class="row">
+	
 		<div class="col-md-2 col-sm-12 bg-light">
-		{{input type="checkbox" checked=showsvgout}}Show Debug output{{mfFlag}}
+		  {{input type="checkbox" checked=showsvgout}}Show Debug output
 		</div>
-		<div class="col-md-8 col-sm-12 bg-info" id="svgView" style="overflow: hidden; height:600px;">
-		  <div>
-		    {{{svg}}}
+		
+		<div class="col-md-8 col-sm-12 bg-info" style="overflow: hidden; height:600px;">
+		  <div class="container-fluid" id = "svgView">
+			  <div class="aligned-row">
+			    <div class="col-xs-1 svglabel-holder">
+			      <p class="svglabel-left">{{heightRange}}</p>
+			    </div>
+				<div class="col-xs-11">
+			      {{{svg}}}
+			    </div>
+			    <div class="col-xs-1"/>
+				<div class="col-xs-11">
+			      <p class="svglabel-bottom">{{widthRange}}</p>
+				</div>
+			  </div>
 		  </div>
 		  <div class="utilbar">
 			{{#bs-button type="warning" onClick=(action "resetViewer")}}Reset{{/bs-button}}
 		  </div>
 		</div>
+		
 		<div class="col-md-2 col-sm-12 bg-light">
 	    	Rows:{{rows}}
 			<input type="range" 
@@ -49,9 +63,11 @@
 			step=".25">
 			{{input type="checkbox" checked=bottom}}Bottom Shelf
 		</div>
+		
 		<div class="col-md-12 bg-primary {{hidesvgout}}">
 		    {{svg}}
 		</div>
+		
 	</div>
 </div>
 <!--	{{#bs-tab as |tab|}}

@@ -25,7 +25,7 @@ module.exports = function(defaults) {
   // along with the exports of each module as its value.
   
   app.import('node_modules/panzoom/dist/panzoom.js');
-  app.import('node_modules/opentype.js/dist/opentype.js');
+  //app.import('node_modules/opentype.js/dist/opentype.js');
   app.import('node_modules/makerjs/target/js/browser.maker.js');
   app.import('node_modules/bezier-js/bezier.js');
 
