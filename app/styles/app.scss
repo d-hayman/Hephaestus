@@ -32,6 +32,10 @@
   margin-left:19%;
 }
 form {
-  margin-top:10pt;
+  margin-top: 15px;
+}
+.form-title {
+  padding-top: 15px;
+  text-align: center;
 }
 @import "ember-bootstrap/bootstrap";

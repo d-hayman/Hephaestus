@@ -2,7 +2,24 @@
 	<div class="row">
 	
 		<div class="col-md-2 col-sm-12 bg-light">
-		  <button type="button" {{action "addUnit" song}}>Add Shelf Unit</button>
+		  <div class="container-fluid bg-info form-title">
+            <div class="row">
+	          <div class="col-12">
+                <h4>Shelf units:</h4>
+	          </div>
+            </div>
+          </div>
+		  <div class="container-fluid" style="margin-top: 15px;">
+		    <div class="row">
+		      <button class="col-6" type="button" {{action "addUnit" song}}>Add</button>
+		      <button class="col-6" type="button" {{action "removeUnit" song}}>Remove</button>
+              <select class="col-12" size=5 required name="shelfUnits" onchange={{action "setSelection" value="target.value"}} value={{currentUnit}}>
+                {{#each model.shelfUnits as |shelfUnit|}}     
+                  <option value={{shelfUnit.tempid}}>Unit {{shelfUnit.tempid}}</option>      
+                {{/each}} 
+              </select>
+		    </div>
+		  </div>
 		  {{input type="checkbox" checked=showsvgout}}Show Debug output
 		</div>
 		

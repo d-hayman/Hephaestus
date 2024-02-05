@@ -24,6 +24,7 @@ var dbBottom = false;
 var woodThickness = .67;
 var minThickness = .5;
 var maxThickness = 1;
+var tempidC = 1;
     
 function generatesvg(model){
   var t = woodThickness;
@@ -105,7 +106,7 @@ export default Controller.extend(Ember.TargetActionSupport, {
   }),
   
   spzInstance: 'w',
-
+  
   currentUnit: null,
   
   heightRange: computed('renderData.{minHeight,maxHeight}', function() { 
@@ -159,7 +160,28 @@ export default Controller.extend(Ember.TargetActionSupport, {
       sUnit.set('columns', diColumns);
       sUnit.set('recess', dfRecess);
       sUnit.set('bottom', dbBottom);
+      sUnit.set('tempid', tempidC++);
       sSeries.get('shelfUnits').addObject(sUnit);
+      this.send('setSelection', sUnit.tempid);
+	},
+	removeUnit(){
+      let tid = this.get('currentUnit');
+      let shelfUnits = this.get('model').get('shelfUnits');
+      shelfUnits.forEach((shelfUnit) => {
+        if(shelfUnit.tempid == tid)
+          shelfUnits.removeObject(shelfUnit);
+      });
+      this.send('setSelection', -1);
+	},
+	setSelection(selected){
+      this.set('currentUnit', selected);
+      let shelfUnits = this.get('model').get('shelfUnits');
+      shelfUnits.forEach((shelfUnit) => {
+        if(shelfUnit.tempid != selected)
+          shelfUnit.set('hideUnselected', "hideme");
+        else
+          shelfUnit.set('hideUnselected', "");
+      });
 	}
   }
 });

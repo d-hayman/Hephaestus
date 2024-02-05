@@ -1,4 +1,11 @@
-<form>
+<div class="container-fluid bg-info form-title {{model.hideUnselected}}">
+  <div class="row">
+	<div class="col-12">
+      <h4>Edit Shelf Unit {{model.tempid}}:</h4>
+	</div>
+  </div>
+</div>
+<form class="{{model.hideUnselected}}">
   <div class="form-group">
     <label for="rowslider">Rows:{{model.rows}}</label>
     <input type="range" class="form-control"
