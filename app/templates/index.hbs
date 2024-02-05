@@ -1,7 +1,7 @@
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-md-2 col-sm-12 bg-light">
-		{{input type="checkbox" checked=showsvgout}}Show Debug output
+		{{input type="checkbox" checked=showsvgout}}Show Debug output{{mfFlag}}
 		</div>
 		<div class="col-md-8 col-sm-12 bg-info" id="svgView" style="overflow: hidden; height:600px;">
 		  <div>
@@ -26,21 +26,21 @@
 			max=4
 			value={{columns}} 
 			step="1">
-	    	Shelf Inner Height:{{height}}
+	    	Shelf Inner Height:{{height}}"
 			<input type="range" 
 			oninput={{action (mut height) value="target.value"}} 
 			min=2 
 			max=10
 			value={{height}} 
 			step=".25">
-	    	Shelf Inner Width:{{width}}
+	    	Shelf Inner Width:{{width}}"
 			<input type="range" 
 			oninput={{action (mut width) value="target.value"}} 
 			min=2 
 			max=10
 			value={{width}} 
 			step=".25">
-	    	Shelf Inner Depth:{{depth}}
+	    	Shelf Inner Depth:{{depth}}"
 			<input type="range" 
 			oninput={{action (mut depth) value="target.value"}} 
 			min=2 
