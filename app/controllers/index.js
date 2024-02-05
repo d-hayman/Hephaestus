@@ -24,13 +24,24 @@ var dbBottom = false;
 var woodThickness = .67;
 var minThickness = .5;
 var maxThickness = 1;
-var scaleFactor = 1; //semi-deprecated due to finding a superior zoom library - keep at 1 unless a reason not to do so ever comes up
     
-function generatesvg(height, width, depth, rows, columns, recess, bottom){
-  //set scaled values from unscaled counterparts in case scaleFactor is ever used again
-  var h = height*scaleFactor;
-  var w = width*scaleFactor;
-  var t = woodThickness * scaleFactor;
+function generatesvg(model){
+  var t = woodThickness;
+  
+  function generateshelfUnit(height, width, rows, columns, bottom){
+	this.models = {};
+	//generate shelves
+    for(var c = 0; c <= columns; c++){
+      this.models["wall"+c] =  makerjs.$(new makerjs.models.Rectangle( t, (t+height)*rows+(bottom?t:0) ))
+               .move([(width+t)*c, 0])
+               .$result;
+    }
+    for(var r = (bottom?0:1); r <= rows; r++){
+      this.models["shelf"+r] = makerjs.$(new makerjs.models.Rectangle((t+width)*columns+t, t))
+               .move([0, (height+t)*r - (bottom?0:t) ])
+               .$result;
+    }
+  }
 
   //set up shelves object
   var shelves = {
@@ -40,22 +51,35 @@ function generatesvg(height, width, depth, rows, columns, recess, bottom){
     units: makerjs.unitType.Inch
   };
   
-  //generate shelves
-  for(var c = 0; c <= columns; c++){
-    shelves.models["wall"+c] =  makerjs.$(new makerjs.models.Rectangle( t, (t+h)*rows+(bottom?t:0) ))
-               .move([(w+t)*c, 0])
-               .$result;
-  }
-  for(var r = (bottom?0:1); r <= rows; r++){
-    shelves.models["shelf"+r] = makerjs.$(new makerjs.models.Rectangle((t+w)*columns+t, t))
-               .move([0, (h+t)*r - (bottom?0:t) ]) //for a fun time, reintroduce rendering bugs by removing "- (bottom?0:t)" and commenting out the cleanup steps below. This is a good way to demonstrate how cleanup fixes it.
-               .$result;
-  }
+  //generate shelf units and collect size data
+  var totalWidth = 0;
+  var totalHeight = 0;
+  var minHeight = 0;
+  var maxHeight = 0;
+  var minWidth = 0;
+  var maxWidth = 0;
+  var shelfUnits = model.get('shelfUnits');
+  shelfUnits.forEach((shelfUnit, index) => {
+	let height = parseFloat(shelfUnit.get('height'));
+	let width = parseFloat(shelfUnit.get('width'));
+	let rows = parseInt(shelfUnit.get('rows'));
+	let columns = parseInt(shelfUnit.get('columns'));
+	let bottom = shelfUnit.get('bottom');
+    shelves.models["unit"+index] = makerjs.model.move(new generateshelfUnit(height, width, rows, columns, bottom), [totalWidth, 0]);
+	totalWidth += (width+t) * columns;
+	totalHeight = Math.max(totalHeight, (height+t) * rows + (bottom?t:0));
+	minHeight = Math.max(minHeight, (height+minThickness) * rows + (bottom?minThickness:0));
+	maxHeight = Math.max(maxHeight, (height+maxThickness) * rows + (bottom?maxThickness:0));
+	minWidth += (parseFloat(shelfUnit.get('width'))+minThickness) * parseInt(shelfUnit.get('columns'));
+	maxWidth += (parseFloat(shelfUnit.get('width'))+maxThickness) * parseInt(shelfUnit.get('columns'));
+  });
+  //add last wall to measurements
+  totalWidth+=t; minWidth+=minThickness; maxWidth+=maxThickness;
   
   //generate measurements
   shelves.paths = {
-    "heightguide": new makerjs.paths.Line([-1, 0], [-1, (t+h)*rows+(bottom?t:0)]),
-    "widthguide": new makerjs.paths.Line([0, -1], [(t+w)*columns+t, -1])
+    "heightguide": new makerjs.paths.Line([-1, 0], [-1, totalHeight]),
+    "widthguide": new makerjs.paths.Line([0, -1], [totalWidth, -1])
   };
 
   //generate bounding box
@@ -69,7 +93,7 @@ function generatesvg(height, width, depth, rows, columns, recess, bottom){
   makerjs.model.originate(shelves);
   makerjs.model.simplify(shelves);
 
-  return  makerjs.exporter.toSVG(shelves);
+  return  {svg: makerjs.exporter.toSVG(shelves), minHeight: minHeight, maxHeight: maxHeight, minWidth: minWidth, maxWidth: maxWidth};
 }
 
 //begin core controller logic
@@ -82,45 +106,18 @@ export default Controller.extend(Ember.TargetActionSupport, {
   
   spzInstance: 'w',
 
-  height: dfHeight,
-  width: dfWidth,
-  depth: dfDepth,
-  rows: diRows,
-  columns: diColumns,
-  recess: dfRecess,
-  bottom: dbBottom,
+  currentUnit: null,
   
-  heightRange: computed('height', 'rows', 'bottom', function() {
-    let height = parseFloat(this.get('height'));
-    let rows = parseInt(this.get('rows'));
-    let bottom = this.get('bottom');
-	var minHeight = (minThickness+height)*rows+(bottom?minThickness:0);
-	var maxHeight = (maxThickness+height)*rows+(bottom?maxThickness:0);
-	return ''+minHeight+' - '+maxHeight+' Inches';
+  heightRange: computed('renderData.{minHeight,maxHeight}', function() { 
+    return ''+this.get('renderData').minHeight+' - '+this.get('renderData').maxHeight+' Inches';
   }),
-  widthRange: computed('width', 'columns', function() {
-    let width = parseFloat(this.get('width'));
-    let columns = parseInt(this.get('columns'));
-	var minWidth = (minThickness+width)*columns+minThickness;
-	var maxWidth = (maxThickness+width)*columns+maxThickness;
-    return ''+minWidth+' - '+maxWidth+' Inches';
+  widthRange: computed('renderData.{minWidth,maxWidth}', function() { 
+    return ''+this.get('renderData').minWidth+' - '+this.get('renderData').maxWidth+' Inches'; 
   }),
-
-  svg: computed('height', 'width', 'depth', 'rows', 'columns', 'recess', 'bottom', function() {
-    let height = this.get('height');
-    let width = this.get('width');
-    let depth = this.get('depth');
-    let rows = this.get('rows');
-    let columns = this.get('columns');
-    let recess = this.get('recess');
-    let bottom = this.get('bottom');
-    return generatesvg(parseFloat(height),
-                       parseFloat(width),
-                       parseFloat(depth),
-                       parseInt(rows),
-                       parseInt(columns),
-                       parseFloat(recess),
-                       bottom);
+  svg: computed('renderData.svg', function() { return this.get('renderData').svg; }),
+  renderData: computed('model.shelfUnits.@each.{height,width,depth,rows,columns,recess,bottom}', function() {
+    let model = this.get('model');
+    return generatesvg(model);
   }),
 
   init: function () {//set SVGPanZoom after svg has finished rendering
@@ -130,6 +127,10 @@ export default Controller.extend(Ember.TargetActionSupport, {
       document.body.addEventListener('zoom', function(e) {
         instrument('zoom', e);// We can't just access controller data here so tell route to tell controller to change the text size
       }, true);
+      this.triggerAction({
+        action:'addUnit',
+        target: this
+      });
       this.triggerAction({
         action:'resetViewer',
         target: this
@@ -147,6 +148,18 @@ export default Controller.extend(Ember.TargetActionSupport, {
 		var tmp = this.get('spzInstance');
 		document.querySelector('.svglabel-left').style.fontSize = ''+(14/tmp.getTransform().scale)+'pt';
 		document.querySelector('.svglabel-bottom').style.fontSize = ''+(14/tmp.getTransform().scale)+'pt';
+	},
+	addUnit(){//creates a new shelf unit with default values
+      let sSeries = this.get('model');
+      let sUnit = this.store.createRecord('shelf-unit');
+      sUnit.set('height', dfHeight);
+      sUnit.set('width', dfWidth);
+      sUnit.set('depth', dfDepth);
+      sUnit.set('rows', diRows);
+      sUnit.set('columns', diColumns);
+      sUnit.set('recess', dfRecess);
+      sUnit.set('bottom', dbBottom);
+      sSeries.get('shelfUnits').addObject(sUnit);
 	}
   }
 });

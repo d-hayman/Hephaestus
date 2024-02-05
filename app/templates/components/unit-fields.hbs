@@ -1,0 +1,52 @@
+<form>
+  <div class="form-group">
+    <label for="rowslider">Rows:{{model.rows}}</label>
+    <input type="range" class="form-control"
+      id="rowslider"
+      oninput={{action (mut model.rows) value="target.value"}} 
+      min=1 
+      max=6
+      value={{model.rows}} 
+      step="1">
+    <label for="columnslider">Columns:{{model.columns}}</label>
+    <input type="range" class="form-control"
+      id="columnslider"
+      oninput={{action (mut model.columns) value="target.value"}} 
+      min=1 
+      max=4
+      value={{model.columns}} 
+      step="1">
+  </div>
+  
+  <div class="form-group">
+    <label for="heightslider">Shelf Inner Height:{{model.height}}"</label>
+    <input type="range"  class="form-control"
+      id="heightslider"
+      oninput={{action (mut model.height) value="target.value"}} 
+      min=2 
+      max=10
+      value={{model.height}} 
+      step=".25">
+    <label for="widthslider">Shelf Inner Width:{{model.width}}"</label>
+    <input type="range" class="form-control"
+      id="widthslider"
+      oninput={{action (mut model.width) value="target.value"}} 
+      min=2 
+      max=10
+      value={{model.width}} 
+      step=".25">
+    <label for="depthslider">Shelf Inner Depth:{{model.depth}}"</label>
+    <input type="range"  class="form-control"
+      id="depthslider"
+      oninput={{action (mut model.depth) value="target.value"}} 
+      min=2 
+      max=10
+      value={{model.depth}} 
+      step=".25">
+  </div>
+  <div class="form-group">
+    <div class="form-control">
+      {{input type="checkbox" checked=model.bottom}}<span> Bottom Shelf</span>
+    </div>
+  </div>
+</form>

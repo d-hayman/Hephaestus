@@ -3,7 +3,7 @@ import {subscribe} from '@ember/instrumentation';
 
 export default Route.extend({
   model(){
-		return this.store.createRecord('shelf-unit');
+		return this.store.createRecord('shelf-series');
   },
   setupController: function (controller, model) {
     controller.set('model', model);
