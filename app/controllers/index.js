@@ -84,6 +84,7 @@ function generatesvg(model, selected){
   var maxWidth = 0;
   var shelfUnits = model.get('shelfUnits');
   var unitCenter = null;
+  var highlightedSection = null;
   shelfUnits.forEach((shelfUnit, index) => {
 	let height = parseFloat(shelfUnit.get('height'));
 	let width = parseFloat(shelfUnit.get('width'));
@@ -91,8 +92,11 @@ function generatesvg(model, selected){
 	let columns = parseInt(shelfUnit.get('columns'));
 	let bottom = shelfUnit.get('bottom');
     shelves.models["unit"+index] = makerjs.model.move(new generateshelfUnit(height, width, rows, columns, bottom), [totalWidth, 0]);
-	if(index == selected-1)
+	if(index == selected-1){
       unitCenter = totalWidth+((t+width)*columns+t)/2;
+	  highlightedSection = makerjs.cloneObject(shelves.models["unit"+index]);
+      highlightedSection.layer = "blue";
+	}
 	//collect measurements
 	totalWidth += (width+t) * columns;
 	totalHeight = Math.max(totalHeight, (height+t) * rows + (bottom?t:0));
@@ -109,7 +113,7 @@ function generatesvg(model, selected){
   shelves.paths["widthguide"] = new makerjs.paths.Line([0, -1], [totalWidth, -1]);
   if(unitCenter != null){
     shelves.models['arrow'] = new makeArrow(unitCenter, totalHeight);
-	shelves.models.arrow.layer = "red";
+	shelves.models.arrow.layer = "blue";
   }
 
   //generate bounding box
@@ -122,6 +126,9 @@ function generatesvg(model, selected){
    */
   makerjs.model.originate(shelves);
   makerjs.model.simplify(shelves);
+  
+  if(highlightedSection != null)
+    shelves.models['highlighted'] = highlightedSection;
 
   return  {svg: makerjs.exporter.toSVG(shelves), minHeight: minHeight, maxHeight: maxHeight, minWidth: minWidth, maxWidth: maxWidth};
 }
