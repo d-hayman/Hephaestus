@@ -135,6 +135,40 @@ function generatesvg(model, selected){
   return  {svg: makerjs.exporter.toSVG(shelves), minHeight: minHeight, maxHeight: maxHeight, minWidth: minWidth, maxWidth: maxWidth};
 }
 
+function generateParts(model){
+  var t = woodThickness;
+  
+  function generateshelfUnit(height, width, rows, columns, bottom){
+	this.models = {};
+	//generate shelves
+    for(var c = 0; c <= columns; c++){
+      this.models["wall"+c] =  makerjs.$(new makerjs.models.Rectangle( t, (t+height)*rows+(bottom?t:0) ))
+               .move([(width+t)*c, 0])
+               .$result;
+    }
+    for(var r = (bottom?0:1); r <= rows; r++){
+      this.models["shelf"+r] = makerjs.$(new makerjs.models.Rectangle((t+width)*columns+t, t))
+               .move([0, (height+t)*r - (bottom?0:t) ])
+               .$result;
+    }
+  }
+
+  //set up parts object
+  var parts = {
+    models: {},
+	paths:{},
+    units: makerjs.unitType.Inch
+  };
+  var shelfUnits = model.get('shelfUnits');
+  shelfUnits.forEach((shelfUnit, index) => {
+	let height = parseFloat(shelfUnit.get('height'));
+	let width = parseFloat(shelfUnit.get('width'));
+	let rows = parseInt(shelfUnit.get('rows'));
+	let columns = parseInt(shelfUnit.get('columns'));
+	let bottom = shelfUnit.get('bottom');
+  });
+}
+
 //begin core controller logic
 export default Controller.extend(Ember.TargetActionSupport, {
   showsvgout: false,

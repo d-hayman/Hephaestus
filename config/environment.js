@@ -44,7 +44,8 @@ module.exports = function(environment) {
   }
 
   if (environment === 'production') {
-    // here you can enable a production-specific feature
+	ENV.baseURL = '/~gkwworks/hephaestus/';
+    ENV.locationType = 'none';
   }
 
   return ENV;
